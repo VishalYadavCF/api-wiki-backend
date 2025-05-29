@@ -1,8 +1,7 @@
-package com.redcat.tutorials;
+package com.redcat.tutorials.callgraphgenerator;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.io.File;
@@ -14,7 +13,7 @@ public class JCallGraph {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 2) {
-            System.err.println("Usage: java com.redcat.tutorials.JCallGraph <classes_directory> [output_directory]");
+            System.err.println("Usage: java com.redcat.tutorials.callgraphgenerator.JCallGraph <classes_directory> [output_directory]");
             System.exit(1);
         }
 
@@ -32,7 +31,9 @@ public class JCallGraph {
         System.out.println("Output will be written to: " + outputDir);
 
         Set<String> classFiles = new HashSet<>();
-        collectClassFiles(classesDir, classFiles);
+        // Pass project root to collectClassFiles
+        File projectRoot = new File("").getAbsoluteFile();
+        collectClassFiles(classesDir, classFiles, projectRoot);
         System.out.println("Found " + classFiles.size() + " class files to analyze");
 
         DynamicCallManager dynamicCallManager = new DynamicCallManager();
@@ -78,6 +79,10 @@ public class JCallGraph {
 
         EndpointCallGraphBuilder builder = new EndpointCallGraphBuilder(globalCallGraph);
         builder.setOutputDir(outputDir);
+        // Pass outputDir as projectRoot for relative path calculation
+        projectRoot = new File(outputDir).getAbsoluteFile();
+        // Re-collect class files with outputDir as project root if needed
+        // collectClassFiles(classesDir, classFiles, projectRoot);
 
         // Enable method body extraction feature
         try {
@@ -94,14 +99,16 @@ public class JCallGraph {
         System.out.println("Analysis complete! Results available in: " + outputDir);
     }
 
-    private static void collectClassFiles(File dir, Set<String> classFiles) {
+    private static void collectClassFiles(File dir, Set<String> classFiles, File projectRoot) {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
-                    collectClassFiles(file, classFiles);
+                    collectClassFiles(file, classFiles, projectRoot);
                 } else if (file.getName().endsWith(".class")) {
-                    classFiles.add(file.getAbsolutePath());
+                    // Add relative path instead of absolute path
+                    String relativePath = projectRoot.toPath().relativize(file.getAbsoluteFile().toPath()).toString();
+                    classFiles.add(relativePath);
                 }
             }
         }

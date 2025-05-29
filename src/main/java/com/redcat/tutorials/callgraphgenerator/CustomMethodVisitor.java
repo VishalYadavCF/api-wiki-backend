@@ -1,4 +1,4 @@
-package com.redcat.tutorials;
+package com.redcat.tutorials.callgraphgenerator;
 
 import org.objectweb.asm.MethodVisitor;
 
