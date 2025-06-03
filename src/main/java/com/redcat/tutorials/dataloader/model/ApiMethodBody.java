@@ -1,5 +1,6 @@
 package com.redcat.tutorials.dataloader.model;
 
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -15,6 +16,7 @@ import java.util.List;
 @CompoundIndexes({
     @CompoundIndex(name = "projectName_controllerMethod", def = "{'projectName': 1, 'controllerMethod': 1}", unique = false)
 })
+@Setter
 public class ApiMethodBody {
 
     @Id
@@ -26,39 +28,6 @@ public class ApiMethodBody {
 
     @Indexed
     private String projectName;
-
-    public static class MethodDetail {
-        private String name;
-        private String body;
-        private String filePath;
-
-        public MethodDetail() {
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getBody() {
-            return body;
-        }
-
-        public void setBody(String body) {
-            this.body = body;
-        }
-
-        public String getFilePath() {
-            return filePath;
-        }
-
-        public void setFilePath(String filePath) {
-            this.filePath = filePath;
-        }
-    }
 
     public ApiMethodBody() {
     }

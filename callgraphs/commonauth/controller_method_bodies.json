@@ -206,7 +206,8 @@
       "name" : "org.springframework.cache.CacheManager.getCacheNames",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserController.enableDisable",
     "methods" : [ {
       "name" : "commonauth.controllers.UserController.enableDisable",
@@ -409,7 +410,8 @@
       "name" : "com.amazonaws.services.cognitoidp.model.AdminEnableUserRequest.setUsername",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.AuthController.getTokens",
     "methods" : [ {
       "name" : "commonauth.controllers.AuthController.getTokens",
@@ -489,7 +491,8 @@
       "name" : "org.springframework.http.ResponseEntity.ok",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserController.updateUser",
     "methods" : [ {
       "name" : "commonauth.controllers.UserController.updateUser",
@@ -760,7 +763,8 @@
       "name" : "org.apache.commons.lang3.StringUtils.isNotBlank",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserController.createUser",
     "methods" : [ {
       "name" : "commonauth.controllers.UserController.createUser",
@@ -1069,7 +1073,8 @@
       "body" : "    // parameter  phoneNumber\n    TRYCATCHBLOCK L0 L1 L2 java/lang/Exception\n    TRYCATCHBLOCK L3 L4 L2 java/lang/Exception\n   L0\n    LINENUMBER 124 L0\n    ALOAD 0\n    INVOKESTATIC org/apache/commons/lang3/StringUtils.isBlank (Ljava/lang/CharSequence;)Z\n    IFNE L5\n    ALOAD 0\n   L6\n    LINENUMBER 125 L6\n    INVOKEVIRTUAL java/lang/String.length ()I\n    BIPUSH 6\n    IF_ICMPGE L3\n   L5\n    LINENUMBER 127 L5\n   FRAME SAME\n    LDC \"RETRACTED_PHONE_NUMBER\"\n   L1\n    ARETURN\n   L3\n    LINENUMBER 130 L3\n   FRAME SAME\n    ALOAD 0\n   L7\n    LINENUMBER 131 L7\n    INVOKEVIRTUAL java/lang/String.length ()I\n    ICONST_2\n    ISUB\n    ICONST_4\n    ISUB\n    ISTORE 1\n   L8\n    LINENUMBER 134 L8\n    ALOAD 0\n    ICONST_0\n    ICONST_2\n    INVOKEVIRTUAL java/lang/String.substring (II)Ljava/lang/String;\n    ASTORE 2\n   L9\n    LINENUMBER 135 L9\n    ALOAD 0\n    ALOAD 0\n   L10\n    LINENUMBER 136 L10\n    INVOKEVIRTUAL java/lang/String.length ()I\n    ICONST_4\n    ISUB\n    INVOKEVIRTUAL java/lang/String.substring (I)Ljava/lang/String;\n    ASTORE 3\n   L11\n    LINENUMBER 139 L11\n    LDC \"X\"\n    ILOAD 1\n    INVOKEVIRTUAL java/lang/String.repeat (I)Ljava/lang/String;\n    ASTORE 4\n   L12\n    LINENUMBER 141 L12\n    ALOAD 2\n    ALOAD 4\n    ALOAD 3\n    INVOKEDYNAMIC makeConcatWithConstants(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String; [\n      // handle kind 0x6 : INVOKESTATIC\n      java/lang/invoke/StringConcatFactory.makeConcatWithConstants(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;\n      // arguments:\n      \"\\u0001\\u0001\\u0001\"\n    ]\n   L4\n    ARETURN\n   L2\n    LINENUMBER 142 L2\n   FRAME SAME1 java/lang/Exception\n    ASTORE 1\n   L13\n    LINENUMBER 143 L13\n    LDC \"RETRACTED_PHONE_NUMBER\"\n    ARETURN\n   L14\n    LOCALVARIABLE maskLength I L8 L2 1\n    LOCALVARIABLE visiblePrefix Ljava/lang/String; L9 L2 2\n    LOCALVARIABLE visibleSuffix Ljava/lang/String; L11 L2 3\n    LOCALVARIABLE mask Ljava/lang/String; L12 L2 4\n    LOCALVARIABLE e Ljava/lang/Exception; L13 L14 1\n    LOCALVARIABLE phoneNumber Ljava/lang/String; L0 L14 0\n    MAXSTACK = 3\n    MAXLOCALS = 5\n",
       "filePath" : "/Users/vishal.yadav/IdeaProjects/commonauth/commonauth/target/classes/commonauth/util/MaskingUtils.class"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.AuthController.sessionLogout",
     "methods" : [ {
       "name" : "commonauth.controllers.AuthController.sessionLogout",
@@ -1080,7 +1085,8 @@
       "body" : "    // parameter  logoutRequest\n",
       "filePath" : "/Users/vishal.yadav/IdeaProjects/commonauth/commonauth/target/classes/commonauth/services/AuthenticationService.class"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserLoginController.handleUserConsentForLogin",
     "methods" : [ {
       "name" : "commonauth.controllers.UserLoginController.handleUserConsentForLogin",
@@ -1125,7 +1131,8 @@
       "name" : "org.slf4j.Logger.info",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserLoginController.getAuthToken",
     "methods" : [ {
       "name" : "commonauth.controllers.UserLoginController.getAuthToken",
@@ -1174,7 +1181,8 @@
       "name" : "org.slf4j.Logger.info",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.ApplicationController.getApplicationConfig",
     "methods" : [ {
       "name" : "commonauth.controllers.ApplicationController.getApplicationConfig",
@@ -1188,7 +1196,8 @@
       "name" : "org.slf4j.Logger.info",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.CaptchaVerificationController.<clinit>",
     "methods" : [ {
       "name" : "commonauth.controllers.CaptchaVerificationController.<clinit>",
@@ -1198,7 +1207,8 @@
       "name" : "org.slf4j.LoggerFactory.getLogger",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserLoginController.<clinit>",
     "methods" : [ {
       "name" : "commonauth.controllers.UserLoginController.<clinit>",
@@ -1208,7 +1218,8 @@
       "name" : "org.slf4j.LoggerFactory.getLogger",
       "body" : "// Method body not available (external library or JDK method)"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.UserController.listUserGet",
     "methods" : [ {
       "name" : "commonauth.controllers.UserController.listUserGet",
@@ -1281,7 +1292,8 @@
       "body" : "return this.getExecutor(\n        threadPoolConfig.threadPoolName,\n        threadPoolConfig.coreSize,\n        threadPoolConfig.maxSize,\n        threadPoolConfig.keepAliveTime,\n        threadPoolConfig.timeUnit);",
       "filePath" : "/Users/vishal.yadav/IdeaProjects/commonauth/commonauth/target/classes/commonauth/util/CommonAuthThreadPoolExecutor.class"
     } ]
-  }, {
+  },
+    {
     "controllerMethod" : "commonauth.controllers.ApplicationController.deleteById",
     "methods" : [ {
       "name" : "commonauth.controllers.ApplicationController.deleteById",

@@ -1,7 +1,5 @@
 package com.redcat.tutorials.dataloader.dto;
 
-import com.redcat.tutorials.dataloader.model.ApiMethodBody;
-
 import java.util.List;
 
 /**
@@ -11,22 +9,22 @@ public class MethodBodyResponse {
 
     private String projectName;
     private String controllerMethod;
-    private List<MethodDetail> methods;
+    private List<MethodDetailResponse> methods;
     private boolean found;
     private String message;
 
-    public static class MethodDetail {
+    public static class MethodDetailResponse {
         private String name;
         private String body;
         private String filePath;
 
-        public MethodDetail() {
+        public MethodDetailResponse() {
         }
 
-        public MethodDetail(ApiMethodBody.MethodDetail methodDetail) {
-            this.name = methodDetail.getName();
-            this.body = methodDetail.getBody();
-            this.filePath = methodDetail.getFilePath();
+        public MethodDetailResponse(MethodDetailResponse methodDetailResponse) {
+            this.name = methodDetailResponse.getName();
+            this.body = methodDetailResponse.getBody();
+            this.filePath = methodDetailResponse.getFilePath();
         }
 
         public String getName() {
@@ -73,11 +71,11 @@ public class MethodBodyResponse {
         this.controllerMethod = controllerMethod;
     }
 
-    public List<MethodDetail> getMethods() {
+    public List<MethodDetailResponse> getMethods() {
         return methods;
     }
 
-    public void setMethods(List<MethodDetail> methods) {
+    public void setMethods(List<MethodDetailResponse> methods) {
         this.methods = methods;
     }
 

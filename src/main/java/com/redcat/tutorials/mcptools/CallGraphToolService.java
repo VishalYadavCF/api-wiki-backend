@@ -1,12 +1,11 @@
 package com.redcat.tutorials.mcptools;
 
-import com.redcat.tutorials.dataloader.dto.ApiListResponse;
 import com.redcat.tutorials.dataloader.dto.CallGraphResponse;
 import com.redcat.tutorials.dataloader.dto.MethodBodyResponse;
-import com.redcat.tutorials.dataloader.dto.EndpointCallGraphDetailsResponse;
 import com.redcat.tutorials.dataloader.exception.ControllerMethodNotFoundException;
 import com.redcat.tutorials.dataloader.exception.MethodNotFoundException;
 import com.redcat.tutorials.dataloader.exception.ProjectNotFoundException;
+import com.redcat.tutorials.dataloader.model.ApiMethodBody;
 import com.redcat.tutorials.dataloader.service.CallGraphService;
 import com.redcat.tutorials.dataloader.service.MethodBodyService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,7 +69,7 @@ public class CallGraphToolService {
      * @return The call graph response containing all method calls
      */
     @Tool(name = "getControllerEndpoints", description = "Retrieve the list of api endpoints/controller methods in the project")
-    public ApiListResponse getAllTheControllerEndpoints(
+    public List<ApiMethodBody> getAllTheControllerEndpoints(
             @Parameter(description = "The name of the project") String projectName
     ) {
         try {
@@ -78,11 +77,11 @@ public class CallGraphToolService {
             return methodBodyService.getAllTheControllerEndpoints(projectName);
         } catch (ProjectNotFoundException | MethodNotFoundException e) {
             log.warn("AI Tool: Error retrieving call graph", e);
-            ApiListResponse errorResponse = new ApiListResponse();
-            errorResponse.setFound(false);
-            errorResponse.setMessage(e.getMessage());
-            errorResponse.setProjectName(projectName);
-            return errorResponse;
+//            ApiMethodBody apiMethodBody = new ApiMethodBody();
+//            errorResponse.setFound(false);
+//            errorResponse.setMessage(e.getMessage());
+//            errorResponse.setProjectName(projectName);
+            return null;
         }
     }
 
@@ -127,7 +126,7 @@ public class CallGraphToolService {
      *
      * @return List of project names
      */
-    @Tool(name = "listAllProjects", description = "List all projects available in the call graph database")
+    @Tool(name = "listAllProjects", description = "List all projects/codebase/repositories available in the call graph database")
     public Map<String, Object> listAllProjects() {
         log.info("AI Tool: Listing all projects");
         List<String> projects = callGraphService.getAllProjects();

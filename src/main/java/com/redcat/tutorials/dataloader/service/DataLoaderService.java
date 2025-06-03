@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redcat.tutorials.dataloader.dto.LoadDataResponse;
 import com.redcat.tutorials.dataloader.model.ApiMethodBody;
 import com.redcat.tutorials.dataloader.model.FullCallGraph;
+import com.redcat.tutorials.dataloader.model.MethodDetail;
 import com.redcat.tutorials.dataloader.repository.ApiMethodBodyRepository;
 import com.redcat.tutorials.dataloader.repository.FullCallGraphRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -116,14 +117,14 @@ public class DataLoaderService {
                 }
                 apiMethodBody.setProjectName(projectName);
 
-                List<ApiMethodBody.MethodDetail> methodDetails = new ArrayList<>();
+                List<MethodDetail> methodDetails = new ArrayList<>();
                 // Only process methods if they exist
                 if (controller.has("methods")) {
                     JsonNode methods = controller.get("methods");
 
                     if (methods != null && methods.isArray()) {
                         for (JsonNode methodNode : methods) {
-                            ApiMethodBody.MethodDetail detail = new ApiMethodBody.MethodDetail();
+                             MethodDetail detail = new  MethodDetail();
                             detail.setName(methodNode.has("name") ? methodNode.get("name").asText() : "");
                             detail.setBody(methodNode.has("body") ? methodNode.get("body").asText() : "");
                             detail.setFilePath(methodNode.has("filePath") ? methodNode.get("filePath").asText() : "");
@@ -148,9 +149,9 @@ public class DataLoaderService {
                     apiMethodBody.setControllerMethod(entry.getKey());
                     apiMethodBody.setProjectName(projectName);
 
-                    List<ApiMethodBody.MethodDetail> methodDetails = new ArrayList<>();
+                    List< MethodDetail> methodDetails = new ArrayList<>();
                     for (Map<String, String> methodMap : entry.getValue()) {
-                        ApiMethodBody.MethodDetail detail = new ApiMethodBody.MethodDetail();
+                         MethodDetail detail = new  MethodDetail();
                         detail.setName(methodMap.get("name"));
                         detail.setBody(methodMap.get("body"));
                         detail.setFilePath(methodMap.get("filePath"));
