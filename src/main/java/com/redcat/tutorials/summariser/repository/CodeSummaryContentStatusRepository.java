@@ -25,4 +25,6 @@ public interface CodeSummaryContentStatusRepository extends MongoRepository<Code
     long countBySummaryId(String summaryId);
 
     long countBySummaryIdAndStatus(String summaryId, CodeSummaryStatus status);
+
+    List<CodeSummaryContentStatus> findByProjectNameAndStatus(String projectName, CodeSummaryStatus status);
 }

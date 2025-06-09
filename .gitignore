@@ -36,3 +36,16 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Custom ignore for generated and large folders
+callgraphs/dexter-recon/
+callgraphs/dexter-report/
+callgraphs/dexter-service/
+callgraphs/pgmerchantservice/
+callgraphs/pgrefundsvc/
+callgraphs/pgupisvc/
+callgraphs/spreadsheet/
+cloned-projects/
+mcp/
+volumes/
+

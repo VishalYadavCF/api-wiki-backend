@@ -5,10 +5,14 @@ import org.springframework.stereotype.Repository;
 
 import com.redcat.tutorials.summariser.model.CodeSummaryContentEntity;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CodeSummaryContentRepository extends MongoRepository<CodeSummaryContentEntity, String> {
 
     Optional<CodeSummaryContentEntity> findByCodeSummaryContentId(String codeSummaryContentId);
+
+    List<CodeSummaryContentEntity> findAllByCodeSummaryContentIdIn(Collection<String> codeSummaryContentIds);
 }

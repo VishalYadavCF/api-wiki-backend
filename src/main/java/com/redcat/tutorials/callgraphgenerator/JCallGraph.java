@@ -15,10 +15,14 @@ public class JCallGraph {
 
     public static void main(String[] args) throws IOException {
 
-        String classesPath = "/Users/vishal.yadav/IdeaProjects/commonauth/commonauth/target/classes";
-        String outputDir = args.length > 1 ? args[1] : "./output";
+        String projectName = "data-explorer/spreadsheet";
+        String classesPath = "/Users/vishal.yadav/IdeaProjects/SpringApiCallGraph/spring-api-callgraph/cloned-projects/" + projectName + "/target/classes";
+        String outputDir = args.length > 1 ? args[1] : "./callgraphs/" + projectName;
 
         File classesDir = new File(classesPath);
+        if (!classesDir.setReadable(true, false)) {
+            System.err.println("Failed to set directory as readable: " + classesDir.getAbsolutePath());
+        }
         if (!classesDir.isDirectory()) {
             System.err.println("Provided classes path is not a directory: " + classesPath);
             System.exit(1);

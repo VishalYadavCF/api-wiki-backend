@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -109,50 +110,54 @@ public class CodeSummariserService {
         log.info("Starting to prepare prompts for code summary with ID: {}", summaryId);
 
         try {
-            // Update the main summary status to IN_PROGRESS
             CodeSummaryStatusEntity summaryEntity = codeSummaryStatusRepo.findById(summaryId)
                     .orElseThrow(() -> new IllegalArgumentException("Summary with ID " + summaryId + " not found"));
             summaryEntity.setStatus(CodeSummaryStatus.IN_PROGRESS);
             codeSummaryStatusRepo.save(summaryEntity);
 
-            // Retrieve all API endpoints for this project
             List<ApiMethodBody> apiMethodBodies = methodBodyService.getAllTheControllerEndpoints(projectName);
-
             log.info("Found {} endpoints for project {}", apiMethodBodies.size(), projectName);
 
             AtomicInteger completedCount = new AtomicInteger(0);
             List<Map<String, String>> finishedEndpoints = new ArrayList<>();
-
-            // Create a directory for storing business summaries
             createSummaryDirectory(projectName);
 
-            // Process each endpoint
-            for (ApiMethodBody apiMethodBody : apiMethodBodies) {
-                processEndpoint(summaryId, projectName, apiMethodBody.getControllerMethod(),
-                        apiMethodBody, completedCount, finishedEndpoints);
-            }
+            // Wrap each endpoint into a Mono
+            Flux.fromIterable(apiMethodBodies)
+                    .concatMap(apiMethodBody ->
+                            processEndpoint(summaryId, projectName,
+                                    apiMethodBody.getControllerMethod(),
+                                    apiMethodBody, completedCount, finishedEndpoints)
+                    )
+                    .doOnComplete(() -> {
+                        // Mark summary as finished
+                        CodeSummaryStatusEntity finishedSummary = codeSummaryStatusRepo.findById(summaryId).orElseThrow();
+                        finishedSummary.setStatus(CodeSummaryStatus.FINISHED);
+                        finishedSummary.setSuccess(true);
+                        finishedSummary.setApiEndpointsFinished(finishedEndpoints);
+                        codeSummaryStatusRepo.save(finishedSummary);
 
-            // Update the main summary status to FINISHED
-            summaryEntity = codeSummaryStatusRepo.findById(summaryId).orElseThrow();
-            summaryEntity.setStatus(CodeSummaryStatus.FINISHED);
-            summaryEntity.setSuccess(true);
-            summaryEntity.setApiEndpointsFinished(finishedEndpoints);
-            codeSummaryStatusRepo.save(summaryEntity);
+                        log.info("Completed code summary generation for project: {}, summary ID: {}", projectName, summaryId);
+                    })
+                    .doOnError(e -> {
+                        log.error("Error generating code summaries for project {}: {}", projectName, e.getMessage(), e);
+                        updateSummaryStatusOnFailure(summaryId);
+                    })
+                    .subscribe(); // Start the processing chain
 
-            log.info("Completed code summary generation for project: {}, summary ID: {}", projectName, summaryId);
         } catch (Exception e) {
-            log.error("Error generating code summaries for project {}: {}", projectName, e.getMessage(), e);
+            log.error("Error setting up code summary for project {}: {}", projectName, e.getMessage(), e);
             updateSummaryStatusOnFailure(summaryId);
         }
     }
 
-    private void processEndpoint(String summaryId, String projectName, String controllerMethod,
-                                 ApiMethodBody apiMethodBody, AtomicInteger completedCount,
-                                 List<Map<String, String>> finishedEndpoints) {
+
+    private Mono<Void> processEndpoint(String summaryId, String projectName, String controllerMethod,
+                                       ApiMethodBody apiMethodBody, AtomicInteger completedCount,
+                                       List<Map<String, String>> finishedEndpoints) {
         try {
             log.info("Processing endpoint: {}", controllerMethod);
 
-            // Create and save content status entity
             CodeSummaryContentStatus contentStatus = CodeSummaryContentStatus.builder()
                     .summaryId(summaryId)
                     .projectName(projectName)
@@ -162,62 +167,52 @@ public class CodeSummariserService {
 
             CodeSummaryContentStatus savedContentStatus = contentStatusRepository.save(contentStatus);
 
-            // Combine all method bodies into a single string
             StringBuilder combinedMethodBody = new StringBuilder();
             for (MethodDetail method : apiMethodBody.getMethods()) {
                 combinedMethodBody.append("Method: ").append(method.getName()).append("\n");
                 combinedMethodBody.append("```\n").append(method.getBody()).append("\n```\n\n");
             }
 
-            // Generate the prompt for this endpoint
             String prompt = preparePromptForCodeSummary(controllerMethod, combinedMethodBody.toString());
 
-            // Thread.sleep(10000); // Simulate delay for API rate limiting
+            return googleGeminiService.generateContent(apiKey, prompt)
+                    .flatMap(response -> {
+                        try {
+                            String generatedSummary = googleGeminiService.extractResponseText(response);
+                            saveGeneratedSummary(savedContentStatus.getId(), generatedSummary);
+                            savedContentStatus.setStatus(CodeSummaryStatus.FINISHED);
+                            contentStatusRepository.save(savedContentStatus);
 
-            // Call Gemini API to generate the summary in a non-blocking way
-            googleGeminiService.generateContent(apiKey, prompt)
-                .subscribe(response -> {
-                    try {
-                        String generatedSummary = googleGeminiService.extractResponseText(response);
+                            Map<String, String> finishedEndpoint = Map.of(
+                                    "controllerMethod", controllerMethod,
+                                    "status", CodeSummaryStatus.FINISHED.toString()
+                            );
+                            finishedEndpoints.add(finishedEndpoint);
 
-                        // Save the generated summary
-                        saveGeneratedSummary(savedContentStatus.getId(), generatedSummary);
-
-                        // Write summary to a markdown file
-                        writeSummaryToFile(projectName, controllerMethod, generatedSummary);
-
-                        // Update status to FINISHED
-                        savedContentStatus.setStatus(CodeSummaryStatus.FINISHED);
-                        contentStatusRepository.save(savedContentStatus);
-
-                        // Update finished endpoints list
-                        Map<String, String> finishedEndpoint = Map.of(
+                            completedCount.incrementAndGet();
+                            log.info("Generated summary for endpoint: {}, completed count: {}", controllerMethod, completedCount.get());
+                            return Mono.empty();
+                        } catch (Exception e) {
+                            handleEndpointError(savedContentStatus, controllerMethod, e);
+                            return Mono.empty();
+                        }
+                    })
+                    .onErrorResume(error -> {
+                        log.error("Error generating summary for endpoint {}: {}", controllerMethod, error.getMessage(), error);
+                        handleEndpointError(savedContentStatus, controllerMethod, new RuntimeException(error));
+                        finishedEndpoints.add(Map.of(
                                 "controllerMethod", controllerMethod,
-                                "status", CodeSummaryStatus.FINISHED.toString()
-                        );
-                        finishedEndpoints.add(finishedEndpoint);
-
+                                "status", CodeSummaryStatus.FAILED.toString()
+                        ));
                         completedCount.incrementAndGet();
-                        log.info("Generated summary for endpoint: {}, completed count: {}", controllerMethod, completedCount.get());
-                    } catch (Exception e) {
-                        handleEndpointError(savedContentStatus, controllerMethod, e);
-                    }
-                }, error -> {
-                    log.error("Error generating summary for endpoint {}: {}", controllerMethod, error.getMessage(), error);
-                    handleEndpointError(savedContentStatus, controllerMethod, new RuntimeException(error));
-
-                    // Add to finished list with FAILED status
-                    Map<String, String> failedEndpoint = Map.of(
-                            "controllerMethod", controllerMethod,
-                            "status", CodeSummaryStatus.FAILED.toString()
-                    );
-                    finishedEndpoints.add(failedEndpoint);
-                });
+                        return Mono.empty();
+                    }).then();
         } catch (Exception e) {
             log.error("Error processing endpoint {}: {}", controllerMethod, e.getMessage(), e);
-            // Handle setup errors
+            return Mono.empty();
         }
     }
+
 
     private void handleEndpointError(CodeSummaryContentStatus contentStatus, String controllerMethod, Exception e) {
         log.error("Error handling endpoint summary for {}: {}", controllerMethod, e.getMessage(), e);
@@ -245,10 +240,10 @@ public class CodeSummariserService {
         }
     }
 
-    private void writeSummaryToFile(String projectName, String controllerMethod, String summary) {
+    private void writeSummaryToFile(String id, String projectName, String controllerMethod, String summary) {
         try {
             // Clean up controller method name to use as filename
-            String fileName = controllerMethod.replaceAll("[^a-zA-Z0-9]", "_") + ".md";
+            String fileName = controllerMethod.replaceAll("[^a-zA-Z0-9]", "_") + "_"+ id + ".md";
             Path filePath = Paths.get("business-summary", projectName, fileName);
 
             Files.writeString(filePath, summary);
@@ -346,7 +341,7 @@ public class CodeSummariserService {
                             saveGeneratedSummary(failedContent.getId(), generatedSummary);
 
                             // Write summary to a markdown file
-                            writeSummaryToFile(contentProjectName, controllerMethod, generatedSummary);
+                            // writeSummaryToFile(failedContent.getId(), contentProjectName, controllerMethod, generatedSummary);
 
                             // Update status to FINISHED
                             failedContent.setStatus(CodeSummaryStatus.FINISHED);

@@ -2,5 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cloned-projects/data-explorer" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cloned-projects/pgmerchantservice" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cloned-projects/pgrefundsvc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cloned-projects/pgupisvc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cloned-projects/streaminganalytics" vcs="Git" />
   </component>
 </project>
