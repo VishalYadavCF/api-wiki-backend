@@ -50,3 +50,8 @@ mcp/
 volumes/
 
 .env
+/.
+/callgraphs/
+/cloned-projects/
+/business-summary/
+/mcp/
