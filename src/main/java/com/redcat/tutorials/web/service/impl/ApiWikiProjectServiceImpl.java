@@ -6,11 +6,9 @@ import com.redcat.tutorials.summariser.model.CodeSummaryContentStatus;
 import com.redcat.tutorials.summariser.model.CodeSummaryStatus;
 import com.redcat.tutorials.summariser.repository.CodeSummaryContentRepository;
 import com.redcat.tutorials.summariser.repository.CodeSummaryContentStatusRepository;
-import com.redcat.tutorials.web.model.ApiSummaryDto;
 import com.redcat.tutorials.web.model.CodeSummaryResponseDto;
 import com.redcat.tutorials.web.model.ProjectDto;
 import com.redcat.tutorials.web.service.ApiWikiProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.redcat.tutorials.dataloader.model.ApiMethodBody;
 
@@ -61,21 +59,30 @@ public class ApiWikiProjectServiceImpl implements ApiWikiProjectService {
         // Fetch all ApiMethodBody entries
         List<CodeSummaryContentStatus> allApiMethods = codeSummaryContentStatusRepository.findByProjectNameAndStatus(projectName, CodeSummaryStatus.FINISHED);
         List<String> ids = allApiMethods.stream()
-                .map(CodeSummaryContentStatus::getSummaryId)
+                .map(CodeSummaryContentStatus::getId)
                 .collect(Collectors.toList());
         Map<String, CodeSummaryContentStatus> summaryStatusMap = allApiMethods.stream()
-                .collect(Collectors.toMap(CodeSummaryContentStatus::getSummaryId, status -> status));
+                .collect(Collectors.toMap(CodeSummaryContentStatus::getId, status -> status));
         List<CodeSummaryContentEntity> codeSummaryContentEntities = codeSummaryContentRepository.findAllByCodeSummaryContentIdIn(ids);
 
         List<CodeSummaryResponseDto> codeSummaryResponseDtos = codeSummaryContentEntities.stream()
                 .map(entity -> CodeSummaryResponseDto.builder()
                         .id(entity.getCodeSummaryContentId())
-                        .content(entity.getSummary())
                         .project(projectName)
                         .controllerName(summaryStatusMap.get(entity.getCodeSummaryContentId()).getControllerMethod())
                         .build())
                 .collect(Collectors.toList());
         // Map to ApiSummaryDto
         return codeSummaryResponseDtos;
+    }
+
+    @Override
+    public CodeSummaryResponseDto getContentById(String codeSummaryContentId) {
+        return codeSummaryContentRepository.findByCodeSummaryContentId(codeSummaryContentId)
+                .map(entity -> CodeSummaryResponseDto.builder()
+                        .id(entity.getCodeSummaryContentId())
+                        .content(entity.getSummary())
+                        .build())
+                .orElse(null);
     }
 }

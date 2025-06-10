@@ -157,7 +157,6 @@ public class MethodBodyService {
 
     public List<ApiMethodBody> getAllTheControllerEndpoints(String projectName) {
         return apiMethodBodyRepository.findByProjectName(projectName).stream()
-                .map(a -> {a.setMethods(new ArrayList<>()); return a;})
                 .collect(Collectors.toList());
     }
 

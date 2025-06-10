@@ -9,4 +9,5 @@ import java.util.List;
 public interface ApiWikiProjectService {
     List<ProjectDto> getAllProjects();
     List<CodeSummaryResponseDto>  getAllControllerSummariesForAProject(String projectName);
+    CodeSummaryResponseDto getContentById(String codeSummaryContentId);
 }

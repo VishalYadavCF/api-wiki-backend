@@ -13,6 +13,7 @@ import com.redcat.tutorials.summariser.model.CodeSummaryStatusEntity;
 import com.redcat.tutorials.summariser.repository.CodeSummaryContentRepository;
 import com.redcat.tutorials.summariser.repository.CodeSummaryContentStatusRepository;
 import com.redcat.tutorials.summariser.repository.CodeSummaryStatusRepo;
+import ddtrot.dd.trace.util.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -25,10 +26,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.redcat.tutorials.summariser.constants.PromptTemplateConstants.CODE_SUMMARY_PROMPT_FOR_BUSINESS;
@@ -120,7 +118,7 @@ public class CodeSummariserService {
 
             AtomicInteger completedCount = new AtomicInteger(0);
             List<Map<String, String>> finishedEndpoints = new ArrayList<>();
-            createSummaryDirectory(projectName);
+            // createSummaryDirectory(projectName);
 
             // Wrap each endpoint into a Mono
             Flux.fromIterable(apiMethodBodies)
@@ -168,6 +166,13 @@ public class CodeSummariserService {
             CodeSummaryContentStatus savedContentStatus = contentStatusRepository.save(contentStatus);
 
             StringBuilder combinedMethodBody = new StringBuilder();
+
+            if(apiMethodBody.getMethods() == null || apiMethodBody.getMethods().isEmpty()) {
+                log.warn("No methods found for controller: {}", controllerMethod);
+                savedContentStatus.setStatus(CodeSummaryStatus.FINISHED);
+                contentStatusRepository.save(savedContentStatus);
+                return Mono.empty();
+            }
             for (MethodDetail method : apiMethodBody.getMethods()) {
                 combinedMethodBody.append("Method: ").append(method.getName()).append("\n");
                 combinedMethodBody.append("```\n").append(method.getBody()).append("\n```\n\n");
@@ -268,7 +273,8 @@ public class CodeSummariserService {
     }
 
     private String preparePromptForCodeSummary(String apiEndpoint, String content) {
-        return String.format(CODE_SUMMARY_PROMPT_FOR_BUSINESS, apiEndpoint, content);
+        String prompt = String.format(CODE_SUMMARY_PROMPT_FOR_BUSINESS, apiEndpoint, content);
+        return prompt;
     }
 
     public CodeSummaryStatusResponse getSummarisationStatus(String id) {

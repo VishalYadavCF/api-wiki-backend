@@ -12,6 +12,4 @@ import lombok.NoArgsConstructor;
 public class GenericResponseDto <T, E>{
     private T data;
     private E error;
-    private boolean success;
-    private String message;
 }

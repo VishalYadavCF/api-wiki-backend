@@ -67,12 +67,12 @@ public class PromptTemplateConstants {
             "- If certain details are missing, note them as assumptions or suggest contacting the system owner for clarification.\n" +
             "- Do not include internal model instructions or metadata unless explicitly requested.\n" +
             "**Input Provided**: " +
-            "apiEndpointName: {api_endpoint_name}\n" +
-            "method_call_hierarchy: {method_call_hierarchy}\n";
+            "apiEndpointName: %s\n" +
+            "method_call_hierarchy: %s\n";
 
     public static final String CODE_SUMMARY_PROMPT_FOR_CODE_DOCUMENTATION = "You are a code summariser. Your task is to " +
             "summarise the given code snippet in a concise and clear manner.\n"
             + "Code Snippet:\n"
-            + "{code_snippet}\n\n"
-            + "Summary:";
+            + "%s\n\n"
+            + "Summary:%s";
 }

@@ -1,13 +1,17 @@
 package com.redcat.tutorials.web.controller;
 
 import com.redcat.tutorials.web.model.GenericResponseDto;
+import com.redcat.tutorials.web.model.ProjectDto;
+import com.redcat.tutorials.web.service.ApiWikiProjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/wiki/projects")
 public class ApiWikiProjectController {
@@ -19,14 +23,19 @@ public class ApiWikiProjectController {
      * 3. Create project
      */
 
+    private final ApiWikiProjectService apiWikiProjectService;
+
+    public ApiWikiProjectController(ApiWikiProjectService apiWikiProjectService) {
+        this.apiWikiProjectService = apiWikiProjectService;
+    }
+
     @GetMapping ("/")
     public ResponseEntity<GenericResponseDto> getProjectList() {
         // Logic to fetch project list
+        List<ProjectDto> projectDtos = apiWikiProjectService.getAllProjects();
+        GenericResponseDto.builder().data(projectDtos).build();
         return ResponseEntity.ok(GenericResponseDto.builder()
-                .data(List.of("commonauth", "pgupisvc", "pgrefundsvc", "streaminganalytics")) // Replace with actual data
-                .error(null)
-                .success(true)
-                .message("Project list fetched successfully")
+                .data(projectDtos)
                 .build());
     }
 }

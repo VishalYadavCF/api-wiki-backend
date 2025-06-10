@@ -49,4 +49,4 @@ cloned-projects/
 mcp/
 volumes/
 
-.env*
+.env
